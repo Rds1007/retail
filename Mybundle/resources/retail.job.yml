@@ -1,0 +1,29 @@
+resources:
+  jobs:
+    retail:
+      name: retail
+      queue:
+        enabled: true
+      tasks:
+        - notebook_task:
+            notebook_path: /Workspace/Users/vasnamapparelandstyling@gmail.com/check_weekend
+          task_key: check_weekend
+        - condition_task:
+            left: '{{tasks.check_weekend.values.is_weekend}}'
+            op: EQUAL_TO
+            right: "true"
+          depends_on:
+            - task_key: check_weekend
+          task_key: if_weekend
+        - depends_on:
+            - outcome: "true"
+              task_key: if_weekend
+          notebook_task:
+            notebook_path: /Workspace/Users/vasnamapparelandstyling@gmail.com/A.py
+          task_key: A
+        - depends_on:
+            - outcome: "false"
+              task_key: if_weekend
+          notebook_task:
+            notebook_path: /Workspace/Users/vasnamapparelandstyling@gmail.com/B.py
+          task_key: B
